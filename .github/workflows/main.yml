@@ -26,6 +26,7 @@ jobs:
     - name: Archive
       run: zip -r NiceCdn.zip NiceCdn/bin/Release/netcoreapp3.1/publish
     - name: create release
+      id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ github.token }}
