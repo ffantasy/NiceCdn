@@ -23,18 +23,23 @@ jobs:
     #  run: dotnet test --no-build --verbosity normal
     - name: Publish
       run: dotnet publish NiceCdn -c Release
-    - name: Archive production artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: publish
-        path: NiceCdn/bin/Release/netcoreapp3.1/publish
-        retention-days: 1
-    - name: release
+    - name: Archive
+      run: zip -r NiceCdn.zip NiceCdn/bin/Release/netcoreapp3.1/publish
+    - name: create release
       uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
       with:
         draft: false
         prerelease: false
         release_name: ${{ steps.version.outputs.version }}
         tag_name: ${{ github.ref }}
+    - name: upload release
+      uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ github.token }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: NiceCdn.zip
+        asset_name: NiceCdn.zip
+        asset_content_type: application/zip
