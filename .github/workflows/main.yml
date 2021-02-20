@@ -22,7 +22,7 @@ jobs:
     - name: Publish
       run: |
         dotnet publish NiceCdn -f netcoreapp3.1 -r win-x64 -c Release --self-contained false -p:PublishSingleFile=true -p:DebugSymbols=false
-        cp NiceCdn\nicecdn.json NiceCdn/bin/Release/netcoreapp3.1/win-x64/publish
+        cp NiceCdn/nicecdn.json NiceCdn/bin/Release/netcoreapp3.1/win-x64/publish
     - name: Archive
       run: zip -r NiceCdn.zip NiceCdn/bin/Release/netcoreapp3.1/win-x64/publish
     - name: create release
