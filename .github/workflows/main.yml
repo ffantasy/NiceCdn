@@ -1,0 +1,39 @@
+name: .NET
+
+on: 
+  workflow_dispatch:
+  #push:
+  #  branches: [ master ]
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build WebApi --no-restore
+    #- name: Test
+    #  run: dotnet test --no-build --verbosity normal
+    - name: Publish
+      run: dotnet publish WebApi -c Release
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: publish
+        path: NiceCdn/bin/Release/netcoreapp3.1/publish
+        retention-days: 1
+    - name: release
+      uses: actions/create-release@v1
+      with:
+        draft: false
+        prerelease: false
+        release_name: ${{ steps.version.outputs.version }}
+        tag_name: ${{ github.ref }}
+        
