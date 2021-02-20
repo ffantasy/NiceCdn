@@ -18,11 +18,11 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build WebApi --no-restore
+      run: dotnet build NiceCdn --no-restore
     #- name: Test
     #  run: dotnet test --no-build --verbosity normal
     - name: Publish
-      run: dotnet publish WebApi -c Release
+      run: dotnet publish NiceCdn -c Release
     - name: Archive production artifacts
       uses: actions/upload-artifact@v2
       with:
