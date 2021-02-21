@@ -12,7 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace PingTest
+namespace NiceCdn
 {
     class Config {
         public string CfWork { get; set; }
