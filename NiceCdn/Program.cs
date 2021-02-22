@@ -142,35 +142,43 @@ namespace NiceCdn
         static async Task DownloadFromRangeAsync(IpRange ipRange)
         {
             Console.WriteLine("This will take several minutes, please wait ...");
-            var i = new Random().Next(ipRange.Begin3, ipRange.End3);
+            var begin3 = new Random().Next(ipRange.Begin3, ipRange.End3);
 
             var cts = new CancellationTokenSource();
             var tasks = new List<Task>();
             KeyValuePair<string, int> maxItem;
             while (true)
             {
-                var end = ipRange.Begin4 + 10;
-                end = end > 254 ? 254 : end;
-                for (int j = ipRange.Begin4; j <= end; j++)
+                var end4 = ipRange.Begin4 + 10;
+                end4 = end4 > ipRange.End4 ? ipRange.End4 : end4;
+                for (; ipRange.Begin4 <= end4; ipRange.Begin4++)
                 {
-                    var ip = $"{ipRange.Prefix}.{i}.{j}";
+                    var ip = $"{ipRange.Prefix}.{begin3}.{ipRange.Begin4}";
                     tasks.Add(Task.Run(async () =>
                     {
                         cts.Token.ThrowIfCancellationRequested();
-                        var ret = await TestDownloadAsync(ip, cfg.CfWork, cfg.TestFile, cfg.TestDuration);
-                        retDic.TryAdd(ip, ret);
+                        try
+                        {
+                            var ret = await TestDownloadAsync(ip, cfg.CfWork, cfg.TestFile, cfg.TestDuration);
+                            retDic.TryAdd(ip, ret);
+                        }
+                        catch
+                        {
+                        }
                     }, cts.Token));
                 }
                 await Task.WhenAll(tasks.ToArray());
+                tasks.Clear();
 
                 maxItem = retDic.OrderByDescending(kvp => kvp.Value).First();
+                retDic.Clear();
                 if (maxItem.Value >= cfg.GoalSpeed)
                 {
-                    Console.WriteLine($"nice ip: {maxItem.Key}");
+                    Console.WriteLine($"nice ip: {maxItem.Key} speed: {maxItem.Value}KB");
                     await applyHostAsync(maxItem.Key);
                     return;
                 }
-                if (end >= 254) break;
+                if (end4 >= 254) break;
             }
 
             await DownloadFromRangeAsync(ipRange);
