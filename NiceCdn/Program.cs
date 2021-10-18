@@ -35,6 +35,7 @@ namespace NiceCdn
     {
         static readonly string HOST_FILE = Path.Combine(Environment.SystemDirectory, @"drivers\etc\hosts");
         static readonly string SERVER_NAME = "nicecdn";
+        static readonly ConsoleColor ORIGIN_COLOR = Console.ForegroundColor;
 
         static private Config cfg;
         static private ConcurrentDictionary<string, int> retDic = new ConcurrentDictionary<string, int>();
@@ -44,7 +45,7 @@ namespace NiceCdn
             var fs = new FileStream("nicecdn.json", FileMode.Open);
             cfg = await JsonSerializer.DeserializeAsync<Config>(fs, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, ReadCommentHandling = JsonCommentHandling.Skip });
 
-            Console.WriteLine($"try test {cfg.IpRange.Prefix} ...");
+            Console.WriteLine($"Try test {cfg.IpRange.Prefix} ...");
             await DownloadFromRangeAsync(cfg.IpRange);
 
             Console.WriteLine("OK. Press enter to exit.");
@@ -170,11 +171,20 @@ namespace NiceCdn
                 await Task.WhenAll(tasks.ToArray());
                 tasks.Clear();
 
+                if (retDic.Count == 0)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("No matched ip found.");
+                    Console.ForegroundColor = ORIGIN_COLOR;
+                    return;
+                }
                 maxItem = retDic.OrderByDescending(kvp => kvp.Value).First();
                 retDic.Clear();
                 if (maxItem.Value >= cfg.GoalSpeed)
                 {
-                    Console.WriteLine($"nice ip: {maxItem.Key} speed: {maxItem.Value}KB");
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.WriteLine($"Nice ip: {maxItem.Key} Speed: {maxItem.Value}KB");
+                    Console.ForegroundColor = ORIGIN_COLOR;
                     await applyHostAsync(maxItem.Key);
                     return;
                 }

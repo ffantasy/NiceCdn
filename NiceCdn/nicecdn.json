@@ -2,11 +2,11 @@
   "cfWork": "dark-lab-58cc.aassdd.workers.dev",
   "testFile": "http://speedtest.tele2.net/100MB.zip", //用于测试下载速度的文件
   "testDuration": 10, //测试时长（秒）
-  "goalSpeed": 500, //目标速度（KB）
+  "goalSpeed": 2000, //目标速度（KB）
   "ipRange": {
-    "prefix": "104.27",
+    "prefix": "104.16", //104.16.0.0-104.31.255.255, 104.24.0.0-104.27.255.255
     "begin3": 1,
-    "end3": 200,
+    "end3": 254,
     "begin4": 1,
     "end4": 254
   }
